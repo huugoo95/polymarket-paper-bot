@@ -4,3 +4,5 @@ __pycache__/
 .env
 *.log
 data/*.csv
+credentials*.txt
+*credentials*.txt
