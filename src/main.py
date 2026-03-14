@@ -16,13 +16,13 @@ from bot.journal import Journal
 def run_paper(config_path: str):
     cfg = load_config(config_path)
     creds = load_credentials()
-    source = MarketDataSource(use_live=bool(creds.api_key))
+    source = MarketDataSource(use_live=bool(creds.private_key and creds.wallet_address))
     journal = Journal()
 
-    if creds.api_key:
-        print("[green]Polymarket credentials loaded from file (live feed enabled)[/green]")
+    if creds.private_key and creds.wallet_address:
+        print("[green]Polymarket wallet credentials loaded (live feed enabled)[/green]")
     else:
-        print("[yellow]No Polymarket credentials file loaded (using fixture feed)[/yellow]")
+        print("[yellow]No complete Polymarket wallet credentials found (using fixture feed)[/yellow]")
 
     markets = source.fetch()
     signals = build_signals(markets, cfg)
@@ -49,7 +49,8 @@ def run_paper(config_path: str):
 
 def run_backtest(config_path: str):
     cfg = load_config(config_path)
-    source = MarketDataSource()
+    creds = load_credentials()
+    source = MarketDataSource(use_live=bool(creds.private_key and creds.wallet_address))
     markets = source.fetch()
     signals = build_signals(markets, cfg)
 

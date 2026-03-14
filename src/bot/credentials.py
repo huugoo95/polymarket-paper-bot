@@ -7,18 +7,16 @@ import os
 
 @dataclass
 class PolymarketCredentials:
-    api_key: str | None = None
-    api_secret: str | None = None
-    passphrase: str | None = None
+    private_key: str | None = None
+    wallet_address: str | None = None
 
 
 def load_credentials() -> PolymarketCredentials:
     """
     Loads credentials from file path in POLYMARKET_CREDENTIALS_FILE.
     Expected file format (KEY=VALUE):
-      POLYMARKET_API_KEY=...
-      POLYMARKET_API_SECRET=...
-      POLYMARKET_PASSPHRASE=...
+      POLYMARKET_PRIVATE_KEY=...
+      POLYMARKET_WALLET_ADDRESS=...
     """
     path = os.getenv("POLYMARKET_CREDENTIALS_FILE")
     if not path:
@@ -37,7 +35,6 @@ def load_credentials() -> PolymarketCredentials:
         data[k.strip()] = v.strip().strip('"').strip("'")
 
     return PolymarketCredentials(
-        api_key=data.get("POLYMARKET_API_KEY"),
-        api_secret=data.get("POLYMARKET_API_SECRET"),
-        passphrase=data.get("POLYMARKET_PASSPHRASE"),
+        private_key=data.get("POLYMARKET_PRIVATE_KEY"),
+        wallet_address=data.get("POLYMARKET_WALLET_ADDRESS"),
     )
