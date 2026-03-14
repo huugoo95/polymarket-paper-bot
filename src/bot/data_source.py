@@ -40,8 +40,9 @@ class MarketDataSource:
                 title = row.get("question") or row.get("description") or "Untitled market"
                 market_id = str(row.get("id") or row.get("conditionId") or title)
 
-                yes_price = _as_float(row.get("outcomePrices", [None])[0], default=0.5)
-                no_price = _as_float(row.get("outcomePrices", [None, None])[1], default=max(0.0, 1 - yes_price))
+                prices = _parse_outcome_prices(row.get("outcomePrices"))
+                yes_price = _as_float(prices[0] if len(prices) > 0 else None, default=0.5)
+                no_price = _as_float(prices[1] if len(prices) > 1 else None, default=max(0.0, 1 - yes_price))
                 spread_pct = max(abs(1 - (yes_price + no_price)) * 100, 0.1)
                 liquidity_usd = _as_float(row.get("liquidity") or row.get("volumeNum"), default=0.0)
 
@@ -63,6 +64,21 @@ class MarketDataSource:
             return markets
         except Exception:
             return []
+
+
+def _parse_outcome_prices(raw) -> list:
+    if raw is None:
+        return []
+    if isinstance(raw, list):
+        return raw
+    if isinstance(raw, str):
+        try:
+            parsed = json.loads(raw)
+            if isinstance(parsed, list):
+                return parsed
+        except Exception:
+            return []
+    return []
 
 
 def _as_float(value, default: float) -> float:

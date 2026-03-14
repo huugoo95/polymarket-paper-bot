@@ -2,12 +2,13 @@
 
 Paper trading + backtesting starter for prediction-market strategies.
 
-## What is implemented (v1)
-- Fixture-based market feed (`data/sample_markets.json`)
-- Signal engine with edge + liquidity + spread filters
+## What is implemented (v1 fast-track)
+- Optional live market feed (Polymarket public endpoint) when credentials file exists
+- Signal engine (micro-bankroll oriented mean-reversion heuristic)
 - Risk sizing per signal (max risk per trade)
 - Paper journal to CSV (`data/paper_trades.csv`)
-- Backtest snapshot mode
+- Snapshot collector (`data/live_snapshots.jsonl`)
+- Backtest over collected snapshots
 
 ## Quickstart
 
@@ -16,8 +17,9 @@ python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 cp .env.example .env
-python src/main.py --mode paper
-python src/main.py --mode backtest
+python src/main.py --mode collect --config config/microbankroll_50.yaml
+python src/main.py --mode paper --config config/microbankroll_50.yaml
+python src/main.py --mode backtest --config config/microbankroll_50.yaml
 ```
 
 ## Credentials integration
@@ -53,3 +55,12 @@ Use `config/default.yaml` and adjust:
 
 ## Safety
 No real-money execution in v1.
+
+
+## Fast workflow for $50 bankroll
+1. Collect snapshots periodically:
+   - `scripts/run-collect.sh` (run multiple times across the day)
+2. Run backtest on collected snapshots:
+   - `python src/main.py --mode backtest --config config/microbankroll_50.yaml`
+3. Run paper mode for candidate signals:
+   - `python src/main.py --mode paper --config config/microbankroll_50.yaml`

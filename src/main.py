@@ -11,6 +11,8 @@ from bot.data_source import MarketDataSource
 from bot.strategy import build_signals
 from bot.risk import size_signal
 from bot.journal import Journal
+from bot.snapshots import append_snapshot, load_snapshots
+from bot.backtest import run_snapshot_backtest
 
 
 def run_paper(config_path: str):
@@ -47,25 +49,43 @@ def run_paper(config_path: str):
     print("[green]Signals logged to data/paper_trades.csv[/green]")
 
 
-def run_backtest(config_path: str):
-    cfg = load_config(config_path)
+def run_collect(config_path: str):
+    _ = load_config(config_path)
     creds = load_credentials()
     source = MarketDataSource(use_live=bool(creds.private_key and creds.wallet_address))
     markets = source.fetch()
-    signals = build_signals(markets, cfg)
+    path = append_snapshot(markets)
+    print(f"[green]Snapshot saved[/green] -> {path} ({len(markets)} markets)")
 
-    print(f"[cyan]Backtest snapshot: {len(markets)} markets, {len(signals)} candidate signals[/cyan]")
+
+def run_backtest(config_path: str):
+    cfg = load_config(config_path)
+    snapshots = load_snapshots()
+
+    if len(snapshots) < 2:
+        print("[yellow]Not enough snapshots for backtest.[/yellow]")
+        print("Run collect mode multiple times first:")
+        print("  python src/main.py --mode collect")
+        return
+
+    result = run_snapshot_backtest(snapshots, cfg)
+    winrate = (result.wins / result.trades * 100) if result.trades else 0.0
+    print(f"[cyan]Backtest over {len(snapshots)} snapshots[/cyan]")
+    print(f"Trades: {result.trades} | Wins: {result.wins} | Losses: {result.losses} | Winrate: {winrate:.1f}%")
+    print(f"PnL: ${result.pnl_usd}")
 
 
 def main():
     load_dotenv()
     parser = argparse.ArgumentParser()
-    parser.add_argument("--mode", choices=["paper", "backtest"], default="paper")
+    parser.add_argument("--mode", choices=["paper", "backtest", "collect"], default="paper")
     parser.add_argument("--config", default="config/default.yaml")
     args = parser.parse_args()
 
     if args.mode == "paper":
         run_paper(args.config)
+    elif args.mode == "collect":
+        run_collect(args.config)
     else:
         run_backtest(args.config)
 
