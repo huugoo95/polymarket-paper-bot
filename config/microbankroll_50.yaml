@@ -9,6 +9,11 @@ strategy:
   min_liquidity_usd: 5000
   max_spread_pct: 4.0
   min_confidence: 0.52
+  min_net_edge_buffer_pct: 0.4
+
+costs:
+  fee_bps: 10
+  slippage_bps: 12
 
 runtime:
   poll_seconds: 60

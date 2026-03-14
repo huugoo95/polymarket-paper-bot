@@ -72,7 +72,7 @@ def run_backtest(config_path: str):
     winrate = (result.wins / result.trades * 100) if result.trades else 0.0
     print(f"[cyan]Backtest over {len(snapshots)} snapshots[/cyan]")
     print(f"Trades: {result.trades} | Wins: {result.wins} | Losses: {result.losses} | Winrate: {winrate:.1f}%")
-    print(f"PnL: ${result.pnl_usd}")
+    print(f"Gross PnL: ${result.gross_pnl_usd} | Fees: ${result.fees_usd} | Net PnL: ${result.net_pnl_usd}")
 
 
 def main():

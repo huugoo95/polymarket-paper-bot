@@ -19,6 +19,13 @@ class StrategyConfig:
     min_liquidity_usd: float
     max_spread_pct: float
     min_confidence: float
+    min_net_edge_buffer_pct: float = 0.4
+
+
+@dataclass
+class CostsConfig:
+    fee_bps: float = 10.0
+    slippage_bps: float = 12.0
 
 
 @dataclass
@@ -31,6 +38,7 @@ class RuntimeConfig:
 class AppConfig:
     risk: RiskConfig
     strategy: StrategyConfig
+    costs: CostsConfig
     runtime: RuntimeConfig
 
 
@@ -41,5 +49,6 @@ def load_config(path: str) -> AppConfig:
     return AppConfig(
         risk=RiskConfig(**data["risk"]),
         strategy=StrategyConfig(**data["strategy"]),
+        costs=CostsConfig(**data.get("costs", {})),
         runtime=RuntimeConfig(**data["runtime"]),
     )

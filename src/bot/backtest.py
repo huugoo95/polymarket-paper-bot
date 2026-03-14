@@ -14,15 +14,18 @@ class BacktestResult:
     trades: int
     wins: int
     losses: int
-    pnl_usd: float
+    gross_pnl_usd: float
+    fees_usd: float
+    net_pnl_usd: float
 
 
 def run_snapshot_backtest(snapshots: List[dict], cfg: AppConfig) -> BacktestResult:
     if len(snapshots) < 2:
-        return BacktestResult(trades=0, wins=0, losses=0, pnl_usd=0.0)
+        return BacktestResult(trades=0, wins=0, losses=0, gross_pnl_usd=0.0, fees_usd=0.0, net_pnl_usd=0.0)
 
     wins = losses = trades = 0
-    pnl = 0.0
+    gross_pnl = 0.0
+    total_fees = 0.0
 
     # evaluate signal at t with exit at t+1
     for i in range(len(snapshots) - 1):
@@ -43,10 +46,14 @@ def run_snapshot_backtest(snapshots: List[dict], cfg: AppConfig) -> BacktestResu
             if entry is None:
                 continue
 
-            trade_pnl = _pnl_from_move(s, entry, exit_m)
-            pnl += trade_pnl
+            trade_gross = _pnl_from_move(s, entry, exit_m)
+            trade_fees = _estimate_fees(s.stake_usd, cfg)
+            trade_net = trade_gross - trade_fees
+
+            gross_pnl += trade_gross
+            total_fees += trade_fees
             trades += 1
-            if trade_pnl >= 0:
+            if trade_net >= 0:
                 wins += 1
             else:
                 losses += 1
@@ -55,8 +62,16 @@ def run_snapshot_backtest(snapshots: List[dict], cfg: AppConfig) -> BacktestResu
         trades=trades,
         wins=wins,
         losses=losses,
-        pnl_usd=round(pnl, 2),
+        gross_pnl_usd=round(gross_pnl, 2),
+        fees_usd=round(total_fees, 2),
+        net_pnl_usd=round(gross_pnl - total_fees, 2),
     )
+
+
+def _estimate_fees(stake_usd: float, cfg: AppConfig) -> float:
+    # entry + exit costs
+    total_bps = (cfg.costs.fee_bps + cfg.costs.slippage_bps) * 2
+    return max(stake_usd, 0.0) * (total_bps / 10000)
 
 
 def _pnl_from_move(signal: Signal, entry: Market, exit_m: Market) -> float:

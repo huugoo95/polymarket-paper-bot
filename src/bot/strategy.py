@@ -14,6 +14,7 @@ def build_signals(markets: List[Market], cfg: AppConfig) -> List[Signal]:
     - Emits YES/NO signals with edge/confidence scores
     """
     signals: List[Signal] = []
+    total_cost_pct = ((cfg.costs.fee_bps + cfg.costs.slippage_bps) / 100.0) + cfg.strategy.min_net_edge_buffer_pct
 
     for m in markets:
         if m.liquidity_usd < cfg.strategy.min_liquidity_usd:
@@ -32,7 +33,7 @@ def build_signals(markets: List[Market], cfg: AppConfig) -> List[Signal]:
         if yes <= 0.47:
             edge = (0.50 - yes) * 100
             confidence = 0.52 + max(0.0, 0.47 - yes)
-            if edge >= cfg.strategy.min_edge_pct and confidence >= cfg.strategy.min_confidence:
+            if edge >= cfg.strategy.min_edge_pct and edge >= total_cost_pct and confidence >= cfg.strategy.min_confidence:
                 signals.append(
                     Signal(
                         market_id=m.id,
@@ -50,7 +51,7 @@ def build_signals(markets: List[Market], cfg: AppConfig) -> List[Signal]:
         if yes >= 0.53:
             edge = (yes - 0.50) * 100
             confidence = 0.52 + max(0.0, yes - 0.53)
-            if edge >= cfg.strategy.min_edge_pct and confidence >= cfg.strategy.min_confidence:
+            if edge >= cfg.strategy.min_edge_pct and edge >= total_cost_pct and confidence >= cfg.strategy.min_confidence:
                 signals.append(
                     Signal(
                         market_id=m.id,
