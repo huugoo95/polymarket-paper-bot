@@ -64,3 +64,23 @@ No real-money execution in v1.
    - `python src/main.py --mode backtest --config config/microbankroll_50.yaml`
 3. Run paper mode for candidate signals:
    - `python src/main.py --mode paper --config config/microbankroll_50.yaml`
+
+
+## Parallel workflow (recommended)
+
+### A) Continuous data collection
+```bash
+scripts/collector_daemon.sh 300 config/microbankroll_50.yaml
+```
+Runs forever, collecting one snapshot every 5 minutes.
+
+### B) Freeze current dataset for fair comparisons
+```bash
+scripts/freeze_dataset.sh
+```
+Creates an immutable copy under `data/datasets/`.
+
+### C) Benchmark multiple strategy configs on same dataset
+```bash
+PYTHONPATH=src python scripts/benchmark_configs.py --dataset data/datasets/<snapshot_file>.jsonl
+```

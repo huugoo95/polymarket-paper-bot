@@ -1,0 +1,20 @@
+risk:
+  bankroll: 50
+  max_risk_per_trade_pct: 1.5
+  max_daily_drawdown_pct: 5.0
+  max_weekly_drawdown_pct: 10.0
+
+strategy:
+  min_edge_pct: 1.2
+  min_liquidity_usd: 15000
+  max_spread_pct: 3.0
+  min_confidence: 0.54
+  min_net_edge_buffer_pct: 0.6
+
+costs:
+  fee_bps: 10
+  slippage_bps: 12
+
+runtime:
+  poll_seconds: 60
+  max_signals_per_cycle: 2
