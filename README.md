@@ -15,8 +15,19 @@ Paper trading + backtesting starter for prediction-market strategies.
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
+cp .env.example .env
 python src/main.py --mode paper
 python src/main.py --mode backtest
+```
+
+## Credentials integration
+- Credentials file is loaded from `POLYMARKET_CREDENTIALS_FILE`.
+- Recommended location: outside repo (already ignored by git).
+- Expected format in file:
+
+```bash
+POLYMARKET_PRIVATE_KEY=...
+POLYMARKET_WALLET_ADDRESS=...
 ```
 
 Or run helper scripts:

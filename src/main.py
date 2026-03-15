@@ -3,8 +3,10 @@ from __future__ import annotations
 import argparse
 from rich import print
 from rich.table import Table
+from dotenv import load_dotenv
 
 from bot.config import load_config
+from bot.credentials import load_credentials
 from bot.data_source import MarketDataSource
 from bot.strategy import build_signals
 from bot.risk import size_signal
@@ -13,8 +15,14 @@ from bot.journal import Journal
 
 def run_paper(config_path: str):
     cfg = load_config(config_path)
-    source = MarketDataSource()
+    creds = load_credentials()
+    source = MarketDataSource(use_live=bool(creds.private_key and creds.wallet_address))
     journal = Journal()
+
+    if creds.private_key and creds.wallet_address:
+        print("[green]Polymarket wallet credentials loaded (live feed enabled)[/green]")
+    else:
+        print("[yellow]No complete Polymarket wallet credentials found (using fixture feed)[/yellow]")
 
     markets = source.fetch()
     signals = build_signals(markets, cfg)
@@ -41,7 +49,8 @@ def run_paper(config_path: str):
 
 def run_backtest(config_path: str):
     cfg = load_config(config_path)
-    source = MarketDataSource()
+    creds = load_credentials()
+    source = MarketDataSource(use_live=bool(creds.private_key and creds.wallet_address))
     markets = source.fetch()
     signals = build_signals(markets, cfg)
 
@@ -49,6 +58,7 @@ def run_backtest(config_path: str):
 
 
 def main():
+    load_dotenv()
     parser = argparse.ArgumentParser()
     parser.add_argument("--mode", choices=["paper", "backtest"], default="paper")
     parser.add_argument("--config", default="config/default.yaml")
