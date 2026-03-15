@@ -1,0 +1,29 @@
+[
+  {
+    "id": "btc-5m-up-1",
+    "title": "BTC up in next 5 minutes?",
+    "yes_price": 0.48,
+    "no_price": 0.52,
+    "spread_pct": 1.2,
+    "liquidity_usd": 56000,
+    "confidence_yes": 0.54
+  },
+  {
+    "id": "eth-1h-up-1",
+    "title": "ETH up in next hour?",
+    "yes_price": 0.41,
+    "no_price": 0.59,
+    "spread_pct": 0.8,
+    "liquidity_usd": 91000,
+    "confidence_yes": 0.58
+  },
+  {
+    "id": "election-yes-1",
+    "title": "Candidate X wins election?",
+    "yes_price": 0.73,
+    "no_price": 0.27,
+    "spread_pct": 3.5,
+    "liquidity_usd": 180000,
+    "confidence_yes": 0.75
+  }
+]

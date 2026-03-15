@@ -2,13 +2,12 @@
 
 Paper trading + backtesting starter for prediction-market strategies.
 
-## Scope (v1)
-- Market data fetch abstraction
-- Signal engine (simple edge rules)
-- Paper broker (simulated execution)
-- Risk manager (position sizing, max daily loss)
-- Backtest runner
-- Trade journal (CSV)
+## What is implemented (v1)
+- Fixture-based market feed (`data/sample_markets.json`)
+- Signal engine with edge + liquidity + spread filters
+- Risk sizing per signal (max risk per trade)
+- Paper journal to CSV (`data/paper_trades.csv`)
+- Backtest snapshot mode
 
 ## Quickstart
 
@@ -17,11 +16,29 @@ python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 python src/main.py --mode paper
+python src/main.py --mode backtest
 ```
 
-## Modes
-- `paper`: simulate live-like decisions with fake execution
-- `backtest`: replay historical snapshots
+Or run helper scripts:
+
+```bash
+scripts/run-paper.sh
+scripts/run-backtest.sh
+```
+
+## Config
+Use `config/default.yaml` and adjust:
+- bankroll
+- max risk per trade
+- min edge
+- min liquidity
+- max spread
+
+## Next steps
+1. Replace fixture feed with live market API adapter.
+2. Add paper positions lifecycle (entry/exit/PnL).
+3. Add drawdown guardrail and auto-stop.
+4. Add test coverage for strategy and sizing logic.
 
 ## Safety
 No real-money execution in v1.
