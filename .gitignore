@@ -4,5 +4,6 @@ __pycache__/
 .env
 *.log
 data/*.csv
+data/*.jsonl
 credentials*.txt
 *credentials*.txt
